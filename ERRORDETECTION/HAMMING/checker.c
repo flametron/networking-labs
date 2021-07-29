@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     int *input;
     char *hamming;
     int *output;
-    int i, j, k, r, il, pos, count, hamlength;
+    int i, j, k, r, il, pos, count, hamlength, wrongbit;
     char c;
     inp = (char *)malloc(101 * sizeof(char));
     hamming = (char *)malloc(101 * sizeof(char));
@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     il = strlen(inp) - 1;
     inp[il] = '\0';
     r = 1;
+    wrongbit = 0;
     while (pow(2, r) < (il + r + 1))
     {
         // this is used to find the number of parity bits that we need to place
@@ -62,14 +63,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    for (int i = 0; i < hamlength; i++)
+    if (hamlength != (il + r))
     {
-        if (output[i] != -1 && output[i] != (hamming[hamlength - i - 1] - 48))
-        {
-            printf("Wrong Hamming Code");
-            return 1;
-        }
+        printf("ERROR: Not same size");
+        return 1;
     }
+    // for (int i = 0; i < hamlength; i++)
+    // {
+    //     if (output[i] != -1 && output[i] != (hamming[hamlength - i - 1] - 48))
+    //     {
+    //         printf("Wrong Hamming Code, Data bit mismatch");
+    //         return 1;
+    //     }
+    // }
     /* DEBUG
     printf("\nMID STAGE 2\n");
     for (i = (r + il - 1); i >= 0; i--)
@@ -97,14 +103,26 @@ int main(int argc, char *argv[])
                 }
             }
 
-            // EVEN Logic
-            if ((hamming[(hamlength - pos)] - 48) != (count % 2))
-            {
-                printf("Wrong Hamming Code");
-                return 1;
-            }
+            output[(pos - 1)] = count % 2; // EVEN Logic
+
             // DEBUG printf("Count = %d\nCount mod 2= %d\nPutting %d at Pos: %d\n", count, count % 2, count % 2, pos);
         }
     }
-    printf("Hamming Code OK");
+    for (int i = 0; i < hamlength; i++)
+    {
+        if ((hamming[(hamlength - i - 1)] - 48) != output[i])
+        {
+            wrongbit += (i + 1);
+        }
+    }
+    if (wrongbit == 0)
+    {
+        printf("Hamming Code OK");
+        return 0;
+    }
+    else
+    {
+        printf("Error at bit: %d from the right", wrongbit);
+        return 1;
+    }
 }
